@@ -1,0 +1,638 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Flutter Web Codelab (pt. 3) - Flutter Web Apps / Animations</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/codelab-elements-tmp/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  id="flutter-web-codelab-riverpod3"
+                  title="Flutter Web Codelab (pt. 3) - Flutter Web Apps / Animations"
+                  environment="web"
+                  feedback-link="https://romanjustcodes.web.app">
+    
+      <google-codelab-step label="Overview" duration="0">
+        <p>Welcome aboard! Join me on part 3 of the Flutter Web Series of Codelabs. If you&#39;ve come from the previous codelabs - great job in making it this far. If not, here&#39;s <a href="https://romanejaquez.github.io/flutterweb-codelab-portfolio1" target="_blank">part 1</a> and <a href="https://romanejaquez.github.io/flutterweb-codelab-portfolio2" target="_blank">part 2</a> for you to catch up.</p>
+<h2 is-upgraded>NOTE: THIS IS NOT A BEGINNER CODELAB</h2>
+<p>(If you&#39;re looking for more beginner content, please visit some of my other codelabs <a href="https://romanjustcodes.web.app/#/workshops" target="_blank">here</a>). If you&#39;re up for the challenge, then proceed.</p>
+<p>In Part 3, you will spruce up your Flutter Web app by implementing animations, elevating your web app and adding some flare! In this codelab you&#39;ll learn the following:</p>
+<ul>
+<li>Animations in Flutter: Implicit &amp; Explicit Animations</li>
+<li>Using the <strong>flutter_animate</strong> package to implement explicit animations in an easy way</li>
+<li>Implement page transitions by tapping into the animated transition capabilities of the <strong>GoRouter</strong> page</li>
+<li>Importing more advanced and complex animations using the <strong>Rive</strong> runtime</li>
+</ul>
+<p>Let&#39;s proceed!!</p>
+<p class="image-container"><img alt="App" src="img/7f12785d033f33d5.gif"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Animations in Flutter: Importing the flutter_animate package" duration="0">
+        <p>Animations in Flutter can be applied out-of-the-box thanks to a number of built-in widgets that provide animation capabilities to your apps, and can be divided into two main categories: <a href="https://docs.flutter.dev/codelabs/implicit-animations" target="_blank">Implicit</a> and <a href="https://docs.flutter.dev/codelabs/explicit-animations#animationcontroller" target="_blank">Explicit</a> animations.</p>
+<p>With <strong>implicit</strong> animations, you get the convenience of adding motion and visual effects with pre-packaged widgets that manage the animation effects for you - you trade control for convenience.</p>
+<p>With <strong>explicit</strong> animations, you have more fine-grained control over how your animation executes, which gives you a lot of flexibility (control the duration, the curve, the type of animation, delay, interval) via <strong>AnimationControllers</strong>.</p>
+<p>In this app, we&#39;ll use <strong>explicit</strong> animations, but using a very handly package called <strong>flutter_animations</strong>, a performant library that makes it simple to add explicit animations - a good balance between convenience and control.</p>
+<p>Start by importing the <strong>flutter animate</strong> package by executing the following command in the command line:</p>
+<pre><code language="language-dart" class="language-dart">flutter pub add flutter_animate
+</code></pre>
+<p>Simple as that, the package gets installed; confirm by checking the <strong>flutter_animate</strong> entry in the <strong>pubspec.yaml</strong>.</p>
+<p>Let&#39;s start implementing some animations, shall we? Hit <strong>Next</strong> to continue.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Welcome Feature page: Animate the widgets" duration="0">
+        <p>Let&#39;s go to one of the previous features developed - the welcome feature. Navigate to the <strong>features/welcome/presentation/pages/welcome_page.dart</strong> file. Let&#39;s accomplish the following animation:</p>
+<p class="image-container"><img alt="App" src="img/301adf30d3181927.gif"></p>
+<p>Let&#39;s proceed.</p>
+<p>First, import the <strong>flutter_animate</strong> package in the <strong>welcome_page.dart</strong> file.</p>
+<pre><code language="language-dart" class="language-dart">import &#39;package:flutter_animate/flutter_animate.dart&#39;;
+
+</code></pre>
+<p>In the <strong>Column</strong> widget that contains all widgets that compose this page, at the end of the array assigned to its <strong>children</strong> property, add the following method:</p>
+<pre><code language="language-dart" class="language-dart">//... rest of the code omitted for brevity
+
+Column(
+    children: [
+        // all widgets are here:
+        // Row()
+        // GreetingsLabel()
+        // Text.rich()
+        // Row()
+    ].animate(),
+),
+
+</code></pre>
+<p>The <strong>animate()</strong> extension method adds the capability to the implementing widget of being animated. This extension method has parameters and callbacks (which we&#39;ll explore in depth as we make progress). For now, we want to cause a staggered animation across all children in this column, therefore set the <strong>interval</strong> property to <strong>100.ms</strong> as such:</p>
+<pre><code language="language-dart" class="language-dart">//... rest of the code omitted for brevity
+
+.animate(
+    interval: 100.ms
+),
+
+</code></pre>
+<p>This will cause a 100-millisecond interval in between child animations. Let&#39;s continue.</p>
+<p>The <strong>animate()</strong> method allows you daisy-chain effect extension methods, such as <strong>fadeIn()</strong>, <strong>scale()</strong>, <strong>slideX()</strong>, etc. We&#39;ll use <strong>slideY()</strong> as we want each item to slide up from the bottom, beginning at one fractional unit and ending at its original position of zero, with half a second duration, and a easeInOut curve, as shown:</p>
+<pre><code language="language-dart" class="language-dart">//... rest of the code omitted
+
+.animate(
+    interval: 100.ms
+)
+.slideY(
+    begin: 1, end: 0,
+    duration: 0.5.seconds,
+    curve: Curves.easeInOut
+),
+
+</code></pre>
+<p>Lastly, chain another effect - <strong>fadeIn()</strong> so as it slides, it fades the child in, as such:</p>
+<pre><code language="language-dart" class="language-dart">.animate(
+    interval: 100.ms
+)
+.slideY(
+    begin: 1, end: 0,
+    duration: 0.5.seconds,
+    curve: Curves.easeInOut
+).fadeIn(),
+
+</code></pre>
+<p>The whole code on the <strong>Column</strong> children would look like this:</p>
+<pre><code language="language-dart" class="language-dart">//... rest of the code omitted for brevity
+
+Column(
+    children: [
+        // all widgets are here:
+        // Row()
+        // GreetingsLabel()
+        // Text.rich()
+        // Row()
+    ].animate(
+        interval: 100.ms
+    )
+    .slideY(
+        begin: 1, end: 0,
+        duration: 0.5.seconds,
+        curve: Curves.easeInOut
+    ).fadeIn(),
+),
+
+</code></pre>
+<h2 is-upgraded>Animate the Hand Icon</h2>
+<p>Let&#39;s truly welcome the users into our app by literally waving at them! Let&#39;s animate the hand icon in our welcome page and make a waving animation using some of the same constructs available in the <strong>flutter_animate</strong> package.</p>
+<p>In the same <strong>welcome.page.dart</strong>, locate the <strong>Icon</strong> widget that shows the wave icon (called <strong>PersonalPortfolioIcons.wave</strong>) and implement the following:</p>
+<ul>
+<li>call the <strong>animate()</strong> method on the <strong>Icon</strong> widget</li>
+<li>tap into the <strong>onPlay</strong> callback on the <strong>animate()</strong>; call the <strong>repeat(reverse: true)</strong> on the provided controller</li>
+<li>call the <strong>rotate()</strong> method as a chain to the <strong>animate()</strong></li>
+<li>pass the following parameters to the <strong>rotate()</strong>: <ul>
+<li>begin: -0.25,</li>
+<li>end: 0,</li>
+<li>curve: Curves.easeInOut</li>
+</ul>
+</li>
+</ul>
+<p>Your code should look like this:</p>
+<pre><code language="language-dart" class="language-dart">//... inside the welcome.page.dart,
+//... animate the Icon widget
+
+const Icon(
+    PersonalPortfolioIcons.wave,
+    size: 90,
+    color: PersonalPortfolioColors.welcomeIcon
+).animate(
+    onPlay:(controller) {
+        controller.repeat(reverse: true);
+    }
+)
+.rotate(
+    begin: -0.25,
+    end: 0,
+    duration: 0.5.seconds,
+    curve: Curves.easeInOut
+),
+
+</code></pre>
+<p>Run the app again and you should be seeing a waving welcoming hand!!</p>
+<p class="image-container"><img alt="App" src="img/935aa480b9e1e76b.gif"></p>
+<p>And that&#39;s it! With just this little bit of code see how we&#39;ve changed the page&#39;s entrance and provided some dynamism to it.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Challenge #1: Implement animations on the Twitter Page" duration="0">
+        <p>Your challenge is to try to accomplish what we show in the animation below:</p>
+<p class="image-container"><img alt="App" src="img/ef2c791ec96af98a.gif"></p>
+<h2 is-upgraded>Requirements:</h2>
+<ul>
+<li>Implement the same animation as in the welcome feature, where we imported the <strong>flutter_animate</strong> package and used the available extension methods such as <strong>animate().slideY().fadeIn()</strong>; adjust the values to your liking and make it your own.</li>
+</ul>
+<h2 is-upgraded>Additional Challenge:</h2>
+<p>Notice in the animated GIF above how the Twitter Icon animates using a scale animation in a pulsating effect. Try to accomplish this animation. Here are some tips:</p>
+<ul>
+<li>use the <strong>animate()</strong> method against the icon widget, and tap into the available callbacks of the <strong>animate()</strong> method. To achieve that pulsating effect (i.e. scaling in and out) you should do the following:<ul>
+<li>Inside the <strong>animate()</strong> method, tap into the <strong>onPlay</strong> callback which takes an <strong>AnimationController</strong> as a parameter, and call this command on the controller:</li>
+</ul>
+<pre><code language="language-dart" class="language-dart">.animate(
+    onPlay: (controller) {
+        controller.repeat(reverse: true);
+    }
+)
+
+</code></pre>
+This will cause the animation to repeat once it reaches the end, and play in reverse. And so on, in an infinite loop.</li>
+<li>Use the <strong>scaleXY()</strong> extension method with the following properties:<ul>
+<li>begin at 80% of its size, then end at 100% of its size</li>
+<li>add a duration of 1 second - use the extension method available, as in 1.seconds</li>
+<li>add a curve</li>
+</ul>
+</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Challenge #2: Implement animations on the rest of the pages" duration="0">
+        <p>Since all the other pages follow a similar simple structure (its children are laid out vertically inside a <strong>Column</strong>), implement the <strong>animate().slideY().fadeIn()</strong> as before with the required parameters, therefore follow the welcome feature page animation codelab from a few steps ago - or you can personalize it and make adjustments as you please. Make them your own!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Implement Page Transitions using GoRouter Animated Transitions" duration="0">
+        <p>So far we&#39;ve been able to implement animations to the widgets inside the pages. Let&#39;s add some animations in between the page transitions, making them fade in as we navigate to them. For that, we&#39;ll leverage some of the widgets provided by <strong>GoRouter</strong> that facilitate this.</p>
+<p>We&#39;ll be accomplishing this:</p>
+<p class="image-container"><img alt="App" src="img/685b5e574a516448.gif"></p>
+<h2 is-upgraded>Current Transitions being implemented as of now</h2>
+<p>If you go to the <strong>routes/app_routes.dart</strong> file and checkout how we implemented the routes, you may notice that every page returned by the corresponding is wrapped inside a <strong>NoTransitionPage</strong> widget, as such:</p>
+<pre><code language="language-dart" class="language-dart">//... inside each route&#39;s pageBuilder
+
+pageBuilder: (context, state) {
+    return const NoTransitionPage(  // &lt;&lt;---- from GoRouter
+        child: GithubPage()
+    );
+}
+
+</code></pre>
+<p>The <strong>NoTransitionPage</strong> is a widget that allows you to implement a custom transition page with no transition. We use custom transition page widgets provided by <strong>GoRouter</strong> in conjunction with implementing the <strong>pageBuilder</strong> method available in every <strong>GoRoute</strong> object.</p>
+<p>The default transition from the <strong>GoRouter</strong> package (if no transition page is added) is a slide transition (when instead of the <strong>pageBuilder</strong> we use the <strong>builder</strong> callback), as the one that displays the <strong>SplashPage</strong> and then the <strong>PortfolioPage</strong> shell page, as such:</p>
+<pre><code language="language-dart" class="language-dart">//... DO NOT COPY, JUST AN EXAMPLE!
+//... we use the default transitions 
+//... available out of the box (i.e. for the SplashPage)
+//... if  you don&#39;t add anything, you&#39;ll get a slide animation
+
+builder: (context, state) {
+    builder: (context, state) =&gt; const SplashPage(),
+},
+
+</code></pre>
+<p>Since we want custom transitions, we will continue tapping into the <strong>pageBuilder</strong> method and we will replace the existing <strong>NoTransitionPage</strong> and implement our own <strong>CustomTransitionPage</strong>.</p>
+<p>There are <a href="https://docs.page/csells/go_router/transitions" target="_blank">several approaches</a> to implement it (even using <strong>MaterialPage</strong>); one of them is as follows (at a bare minimum):</p>
+<ul>
+<li>Create an instance of <strong>CustomTransitionPage</strong></li>
+<li>set the <strong>key</strong> parameter to the the route state&#39;s <strong>pageKey</strong></li>
+<li>set the <strong>child</strong> parameter, which is the page that this custom transition will wrap</li>
+<li>implement the <strong>transitionBuilder</strong> callback, out if which you return an explicit transition animation, such as <strong>FadeTransition</strong>; the <strong>transitionBuilder</strong> callback supplies some arguments that you can use to tap into the inherent animation reference.</li>
+</ul>
+<p>This is how you&#39;d implement it per page route (don&#39;t copy the code just yet, this is just a first iteration sample):</p>
+<pre><code language="language-dart" class="language-dart">// ... this is just a sample
+
+GoRoute(
+    parentNavigatorKey: Utils.tabNav,
+    path: WelcomePage.route,
+    pageBuilder: (context, state) {
+        return CustomTransitionPage(
+        key: state.pageKey,
+            child: const WelcomePage(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+                opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+                child: child,
+            );
+        });
+    }
+)
+
+</code></pre>
+<p>Notice the <strong>pageBuilder</strong> returns the new <strong>CustomTransitionPage</strong> instance, which wraps the <strong>child</strong> page <strong>WelcomePage</strong> and in turn the <strong>transitionBuilder</strong> triggers upon performing the navigation, executing a <strong>FadeTransition</strong>.</p>
+<p>This is a lot of code which we&#39;ll have to duplicate for each page route. A better approach would be to encapsulate this inside an utility method.</p>
+<p>Inside this same <strong>app_routes.dart</strong>, create a <strong>static</strong> method called <strong>pageTransition</strong>, whose job would be to encapsulate the instantiation of a  <strong>CustomTransitionPage</strong> object, with the required parameters, such as <strong>key</strong> and <strong>page</strong>, as such:</p>
+<pre><code language="language-dart" class="language-dart">//... inside the app_routes.dart,
+//... at the bottom, add:
+
+static CustomTransitionPage pageTransition({ required ValueKey key, required Widget page }) {
+    return CustomTransitionPage(
+        key: key,
+        child: page,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+            opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+            child: child,
+        );
+    });
+}
+
+</code></pre>
+<p>Now you can go ahead and use it on each of the routes as such (make this change on all the child routes to the <strong>ShellRoute</strong>):</p>
+<pre><code language="language-dart" class="language-dart">//... do it for all the child routes
+//... of the ShellRoute. rest of the routes omitted for brevity
+
+GoRoute(
+    parentNavigatorKey: Utils.tabNav,
+    path: WelcomePage.route,
+    pageBuilder: (context, state) {
+        return AppRoutes.pageTransition(
+            key: state.pageKey,
+            page: const WelcomePage()
+        );
+    }
+),
+
+</code></pre>
+<p>We still need to do one more improvement. While each of the pages is actually fading in, the background color still pops in, without a transition. Let&#39;s add a simple animation - an <strong>AnimatedContainer</strong> transition - to our <strong>PageColor</strong> shared widget, so that every time  the gradient changes, we also rebuild that container widget and its corresponding gradient.</p>
+<p>Go to the <strong>shared/widgets/pagecolor.dart</strong> and replace the existing <strong>Container</strong> widget returned by the following code:</p>
+<pre><code language="language-dart" class="language-dart">//... rest of the code omitted for brevity
+
+return AnimatedContainer(
+    duration: 1.seconds,
+    curve: Curves.easeInOut,
+    decoration: BoxDecoration(
+        gradient: pageGradient
+    )
+);
+
+</code></pre>
+<p>With this, as the navigation occurs and this widget gets notified of it, it will transition from one color to the other in a 1-second transition using an animation curve.</p>
+<p>Now we should be all set. Take it for a spin and see!</p>
+<p class="image-container"><img alt="App" src="img/685b5e574a516448.gif"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Implement animations on the Navigation Items" duration="0">
+        <p>In this implementation, we&#39;ll use a mixture of implicit and explicit animated widgets to bring much more interactivity and dynamic elements to our web app. We want the items in our navigation to enter using a slide transition, followed by scaling and fading once we toggle them.</p>
+<p>This is what we&#39;ll be tackling:</p>
+<p class="image-container"><img alt="App" src="img/7d4ab22d7ff73603.gif"></p>
+<p>Let&#39;s proceed.</p>
+<p>We&#39;ll be animating the elements of the left navigation, so let&#39;s proceed to the <strong>LeftNavigation</strong> class in the <strong>features/navigation/presentation/widgets/left_navigation.dart</strong> file. Locate the <strong>Column</strong> widget to which we&#39;re feeding a list of <strong>LeftNavigationItemTile</strong> instances to its <strong>children</strong> property.</p>
+<p>At the end of the <strong>List.generate</strong> method, add the following code:</p>
+<pre><code language="language-dart" class="language-dart">//... inside the left_navigation.dart
+//... rest of the code omitted for brevity
+
+Column(
+    children: List.generate(
+        navItems.length, (index) {
+        return LeftNavigationItemTile(
+            item: navItems[index]
+        );
+    }).animate(  // &lt;-- from the .animate down
+        interval: 100.ms
+    ).slideY(
+        begin: 1, end: 0,
+        duration: 0.5.seconds,
+        curve: Curves.easeInOut,
+    ).fadeIn(
+        duration: 0.5.seconds,
+        curve: Curves.easeInOut
+    ),
+),
+
+</code></pre>
+<p>In the code above, we are animating all items generated by the <strong>List.generate</strong> method in a staggered manner (using <strong>animate(interval: 100ms)</strong>), then we proceed to daisy-chain a <strong>slideY()</strong> so it slides up, followed by a <strong>fadeIn()</strong>, both with a duration of 0.5 seconds and an easeInOut curve. This takes care of the sliding and fading in part. This was the <strong>explicit</strong> animated part.</p>
+<p>Now since they rebuild every time a new item is tapped so their state change is reflected accordingly, we&#39;ll tap into this and apply a couple of <strong>implicit</strong> animated widgets (the ones usually preceded by <strong>AnimatedXXX</strong>).</p>
+<p>The convenient thing about these widgets is that you can animate a widget property by setting a target value, and when that value changes, the widget animates the property from the old value to the new one. But besides the target value for the animated property, you can choose a <strong>duration</strong> and a <strong>curve</strong> - not like in the explicit animations where we could control the interval, reverse, repeat, etc. and have more control.</p>
+<p>Let&#39;s proceed to the <strong>LeftNavigationItemTile</strong> class in the <strong>features/navigation/presentation/widgets/left_navigation_item_tile.dart</strong> file.</p>
+<p>Replace the whole content of its <strong>build</strong> method by the code below:</p>
+<pre><code language="language-dart" class="language-dart">// in the left_navigation_item_tile.dart
+// replace the whole build method:
+
+@override
+Widget build(BuildContext context, WidgetRef ref) {
+
+    return AnimatedScale( // &lt;-- we added an AnimatedScale widget
+    duration: 0.25.seconds,
+    curve: Curves.easeInOut,
+    scale: item.isSelected ? 1 : 0.8,
+    child: AnimatedOpacity( // &lt;-- we also added an AnimatedOpacity widget
+        opacity: item.isSelected ? 1 : 0.25,
+        duration: 0.25.seconds,
+        curve: Curves.easeInOut,
+        child: Container(
+        margin: const EdgeInsets.only(top: 20, bottom: 20),
+        child: IconButton(
+                iconSize: 30,
+                icon: Icon(
+                    item.icon,
+                    color: Colors.white,
+                ),
+                onPressed: () {
+                    ref.read(navigationItemsViewModelProvider.notifier).selectNavItem(item);
+                }
+            ),
+        ),
+    ),
+    );
+}
+
+</code></pre>
+<p>In this refactoring, we got rid of the <strong>navItemColor</strong> since we won&#39;t be managing the opacity of the color whether the <strong>item.isSelected</strong> property is true or false, but rather the two other properties we&#39;re interested in manipulating - the <strong>opacity</strong> of the whole button (via the <strong>AnimatedOpacity</strong>) and its scale (via the <strong>AnimatedScale</strong>). We set the <strong>color</strong> property to the <strong>Icon</strong> widget to solid white for simplicity.</p>
+<p>We&#39;ll use the same flag to drive the animation as it toggles between the items, using a smooth and animated transition, nesting them one inside the other so as to execute then in parallel.</p>
+<p>And with that, we implemented a mixture of implicit and explicit animations. Now we have a sliding animation for our navigation items in a staggered fashion, and as we toggle them on or off, we see a scaling and fading at the same time. Neat!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Bonus #1: Rive Animations" duration="0">
+        <p>The following lab is not required as it is not part of the framework out of the box, but supplied by an external library / package. I just wanted to make you aware of its existence, in which you can add high-quality, professional-level grade, high-performant and complex animations using the <strong>Rive</strong> package, available in <a href="https://pub.dev/packages/rive" target="_blank">pub.dev</a>.</p>
+<p>If you want to continue to the next codelab, please do - here&#39;s the <a href="https://romanejaquez.github.io/flutterweb-codelab-portfolio3" target="_blank">link</a>.</p>
+<p>If you want to check it out, stay - this is what I&#39;ll show you what we&#39;ll be building. Check out that for each page, in the background, I display a faded animation sequence corresponding to each page. Each of those animations was created in Rive:</p>
+<p class="image-container"><img alt="App" src="img/7f12785d033f33d5.gif"></p>
+<p>Rive Flutter is a runtime library for Rive, a real-time interactive design and animation tool. This is their <a href="https://rive.app/" target="_blank">official site</a> (did you know the <a href="https://rive.app/editor" target="_blank">Rive editor</a> was developed in Flutter???)</p>
+<p>Rive has two components - the editor and the runtimes. The editor is where you create and animate your designs. From here you can export your work as a video, GIF or PNG sequence, or as a .RIV if you are going to use a runtime.</p>
+<p>Runtimes are open-source libraries that allow you to play and manipulate your animations in realtime across a variety of platforms - in this case we&#39;ll be using the Flutter runtime, packaged inside the <strong>rive</strong> package we mentioned above.</p>
+<p>I&#39;ll show you step by step how I built these animations. For more in-depth tutorials on Rive, you can visit the <a href="https://www.youtube.com/@Rive_app" target="_blank">Rive YouTube</a> channel and their <a href="https://help.rive.app/" target="_blank">guide</a>.</p>
+<h2 is-upgraded>Preparing the assets for Rive</h2>
+<p>One of the great things about Rive is that it works with vector graphics, such as SVGs. You can use your favorite image editor that supports the creation, manipulation and export of SVGs. My editors of choice is <a href="https://www.figma.com/" target="_blank">Figma</a> but any SVG editor would do. That means you&#39;ll end up with high-quality, sharp animations in our Flutter apps.</p>
+<p>Make sure that every element that you want to animate is in a separate layer and a separate element, that way we can manipulate them freely and independently once we are in Rive. Once you&#39;re ready, export them as .SVG files.</p>
+<p class="image-container"><img alt="App" src="img/6ea44080b0605a50.png"></p>
+<p>Rive is free for up to 3 projects. For more projects you must upgrade.</p>
+<p>Their editor is pretty intuitive.</p>
+<p>Going to Rive&#39;s <a target="_blank">main site</a> and clicking on <strong>Get Started</strong> launches the editor. You must create an account with a Gmail account (if you don&#39;t have one already), but the process is pretty quick. Go ahead and come back.</p>
+<p class="image-container"><img alt="App" src="img/e5de84196ea5552f.png"></p>
+<p>Once in the editor, click on the plus (+) icon at the top right corner to create a new artboard, which launches a dialog. Select <strong>Blank Artboard</strong>. Click <strong>Create</strong>.</p>
+<p class="image-container"><img alt="App" src="img/5488c7a47c86ac17.png"></p>
+<p>Artboards are the space where you build your creations, both during creation and animation. You can have more than one artboard in a single file, and you can only have one active artboard at a time.</p>
+<p>They can be any size and you can arrange them any way it makes sense to you.</p>
+<p>More on artboards <a href="https://help.rive.app/editor/fundamentals/artboards" target="_blank">here</a>.</p>
+<p class="image-container"><img alt="App" src="img/effed0f183839dfa.png"></p>
+<p>While in <strong>Design Mode</strong>, drag your SVG assets to be manipulated inside Rive. Arrange them the way you want them to be before any animation is applied.</p>
+<p>Make sure you have a separate artboard for your separate assets&#39; animations. Set up the artboard according to your needs.</p>
+<p class="image-container"><img alt="App" src="img/f3a5c11aea080209.png"></p>
+<p>Flip to <strong>Animate</strong> mode to make your animations. You position your elements, set keyframes that represent their properties over a timeline for a period of time (position, rotation, scale, etc.), and Rive fills in the blanks for you - that&#39;s how animations work in Rive.</p>
+<p class="image-container"><img alt="App" src="img/9502d369ccf7240b.gif"></p>
+<p>You can create multiple animation sequences, and play them as any of the three categories: <strong>One-Shot</strong>, <strong>Loop</strong> or <strong>Ping-Pong</strong>.</p>
+<p>You can have <a href="https://help.rive.app/editor/fundamentals/nested-artboards" target="_blank">nested artboards</a> (as shown above). Notice how one artboard contains a single animation (the linkedin logo moving up and down) while in the artboard above you can copy the artboard below (and &#34;nest&#34; it) as many times, and even adjust their speeds.</p>
+<p>One of the coolest things about Rive is the concept of <strong>State Machines</strong>.</p>
+<p><a href="https://help.rive.app/editor/state-machine" target="_blank">State Machines</a> are a visual way to connect animations together and define the logic that drives the transitions. They allow you to build interactive motion graphics that are ready to be implemented in your product, game, or website.</p>
+<p class="image-container"><img alt="App" src="img/607fbe47317e6a66.png"></p>
+<p>Your state machines execute your animations and connect them together creating a flow. Each animation is considered a <strong>state</strong> (idle, moving, stopped), and transitions allow you to move from state to state (from animation to animation) when a condition is satisfied - yeah, like a state machine.</p>
+<p>You must know the name of the artboard (i.e. in our case, <strong>linkedin</strong>) and the name of the state machine (in our case, also <strong>linkedin</strong>), and sometimes for execution one-shot animations, the name of the animation itself (you guessed it - <strong>linkedin</strong>). That&#39;s why I like naming all of them the same for simple state machines with a single animation. You could also name them like <strong>linkedin_ab</strong> for artboard, <strong>linkedin_sm</strong> for state machine, <strong>linkedin_anim</strong> for animation, and it is a good practice when you have a bunch of them.</p>
+<p>I create one artboard and a corresponding state machine for each of my pages: linkedin, twitter, github, web, welcome, so I should be all set once I get to Flutter to use them.</p>
+<p>I didn&#39;t get into <a href="https://help.rive.app/runtimes/state-machines#inputs-4" target="_blank">inputs</a> but they are a great way to programmatically trigger states in your state machine, so make sure to check those out.</p>
+<p>Once you&#39;re satistied with your animation, you can export it as a .RIV file, for consumption inside Flutter.</p>
+<p>Here&#39;s a link to the animations I&#39;m using (as a .RIV file). Download the .RIV by clicking on <a href="https://github.com/romanejaquez/imghosting/blob/main/personal_portfolio.riv?raw=true" target="_blank">this link</a>.</p>
+<p class="image-container"><img alt="App" src="img/6d7aa89e4879f25c.png"></p>
+<p>Hit <strong>Next</strong> to see how we use this .RIV file in Flutter in the next bonus lab.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Bonus #2: Use our generated .RIV file in Flutter" duration="0">
+        <p>As mentioned before, <a href="https://pub.dev/packages/rive" target="_blank">Rive Flutter</a> is the runtime library for Rive.</p>
+<p>This library allows you to fully control Rive files with a high-level API for simple interactions and animations, as well as a low-level API for creating custom render loops for multiple artboards, animations, and state machines in a single canvas.</p>
+<p>Create a folder under <strong>assets</strong> called <strong>anims</strong> - this is where we&#39;ll place our .RIV files. Our .RIV file is called <strong>personal_portfolio.riv</strong> so we&#39;ll just drag it there (you should&#39;ve downloaded the .RIV file in the previous bonus lab! <a href="https://github.com/romanejaquez/imghosting/blob/main/personal_portfolio.riv?raw=true" target="_blank">Here it is</a> again!).</p>
+<p>Go ahead and install Rive for Flutter now, by running the command:</p>
+<pre><code language="language-dart" class="language-dart">flutter pub add rive
+</code></pre>
+<p>Go to the <strong>pubspec.yaml</strong> and add an entry for your newly created assets subfolder, under <strong>flutter</strong>, as in:</p>
+<pre><code language="language-dart" class="language-dart">//... under the flutter section
+//... (make sure you get the intentation right!)
+assets:
+    - assets/anims/
+
+</code></pre>
+<p>We will create a specific component that based on the navigated route, it will load the appropriate animation (hence the reason why we called our artboards and state machines with the same name as our routes).</p>
+<p>When the user navigates to the desired route, we will notify a shared component called <strong>BgAnimation</strong> to rebuild itself with the animation that matches the navigated route.</p>
+<p>Let&#39;s go to the <strong>shared/providers/shared_providers.dart</strong> and create a <strong>StateProvider</strong> type <strong>String</strong> called <strong>bgPageRouteProvider</strong>:</p>
+<pre><code language="language-dart" class="language-dart">//... inside the shared_providers.dart
+//... at the bottom
+
+final bgPageRouteProvider = StateProvider&lt;String&gt;((ref) {
+  return WelcomePage.route;
+});
+
+</code></pre>
+<p>Its sole purpose is to get its <strong>String</strong> state changed upon route changes, and notify any watching widgets (the <strong>BgAnimation</strong> widget in this case).</p>
+<p>Go to the <strong>navigation</strong> feature, inside <strong>presentation/viewmodels/leftnavigation.viewmodel.dart</strong>, inside the <strong>selectNavItem</strong>, under the setting of the <strong>pageColorProviderNotifier</strong>, read the <strong>bgPageProvider</strong>, set its state to the <strong>item.route</strong>, and you should be good to go.</p>
+<pre><code language="language-dart" class="language-dart">//... inside the leftnavigation.viewmodel.dart&#39;s
+//... selectNavItem method:
+
+// ADD THIS LINE...
+ref.read(bgPageRouteProvider.notifier).state = item.route;
+
+</code></pre>
+<p>NOTE: We could&#39;ve also implemented it as an interceptor in the <strong>app_routes.dart</strong> but here is fine as well.</p>
+<p>This call will trigger a rebuild on any widget watching the <strong>bgPageRouteProvider</strong> provider. Let&#39;s go ahead now and create that component.</p>
+<p>Before we create the component, let&#39;s create some mappings we need to trigger the correct animation that maps to the corresponding route.</p>
+<p>In the <strong>helpers</strong> folder, create an <strong>enums.dart</strong> file, with the following content:</p>
+<pre><code language="language-dart" class="language-dart">enum BackgroundAnimations {
+  welcome,
+  twitter,
+  linkedin,
+  github,
+  web
+}
+
+</code></pre>
+<p>In this file, we&#39;ll keep all our enums and such so this work will be the precursor to future work here in this file.</p>
+<p>Also in the <strong>helpers</strong> folder, but now in the <strong>utils.dart</strong> file, let&#39;s create a quick mapping - a 1:1 relationship between our routes and these animation enum values, as such (make sure to add the page imports as needed):</p>
+<pre><code language="language-dart" class="language-dart">//... in the utils.dart
+
+static Map&lt;String, BackgroundAnimations&gt; pageRouteToAnimations = {
+    WelcomePage.route: BackgroundAnimations.welcome,
+    TwitterPage.route: BackgroundAnimations.twitter,
+    LinkedInPage.route: BackgroundAnimations.linkedin,
+    GithubPage.route: BackgroundAnimations.github,
+    WebPage.route: BackgroundAnimations.web
+};
+
+</code></pre>
+<p>Since this will be a shared component (just like the <strong>PageColor</strong> widget), and will sit right above it in the shell, go to the <strong>shared/widgets/</strong> and create a new file called <strong>bganimation.dart</strong>.</p>
+<p>Paste the following code - let&#39;s dissect it together (add the proper imports as usual):</p>
+<pre><code language="language-dart" class="language-dart">// add the remaining imports as per your project
+import &#39;package:flutter/material.dart&#39;;
+import &#39;package:flutter_riverpod/flutter_riverpod.dart&#39;;
+import &#39;package:rive/rive.dart&#39;;
+
+class BgAnimation extends ConsumerStatefulWidget {
+
+  const BgAnimation({
+    super.key,
+  });
+
+  @override
+  ConsumerState&lt;BgAnimation&gt; createState() =&gt; BgAnimationState();
+}
+
+class BgAnimationState extends ConsumerState&lt;BgAnimation&gt; {
+
+  Map&lt;String, RiveAnimation&gt; animations = {};
+  List&lt;StateMachineController&gt; controllers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    preloadRiveAnimations();
+  }
+
+  void preloadRiveAnimations() {
+
+    for (var animValue in BackgroundAnimations.values) {
+      var animationName = animValue.name;
+      animations[animationName] = RiveAnimation.asset(
+        &#39;./assets/anims/personal_portfolio.riv&#39;,
+        artboard: animationName,
+        fit: BoxFit.contain,
+        onInit: (Artboard artboard) {
+          var smController = StateMachineController.fromArtboard(
+            artboard,
+            animationName
+          )!;
+          artboard.addController(smController);
+          controllers.add(smController);
+        }
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    for (var element in controllers) {
+      element.dispose();
+    }
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+
+    var bgImageRoute = ref.watch(bgPageRouteProvider);
+    var animationEnum = Utils.pageRouteToAnimations[bgImageRoute]!;
+    var animation = animations[animationEnum.name];
+
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height / 2,
+        child: Opacity(
+          opacity: 0.1,
+          child: animation
+        ),
+      ),
+    );
+  }
+}
+
+</code></pre>
+<p>First we create a class called <strong>BgAnimation</strong> which will encapsulate all Rive animations. We import Rive so we can use its constructs (<strong>StateMachineController</strong> and <strong>RiveAnimation</strong>). We create it as a <strong>ConsumerStatefulWidget</strong> since we want to leverage the lifecycle methods (such as <strong>initState</strong>) to initialize (and <strong>dispose()</strong>) to dispose of the animation controllers, as well as obtain a <strong>ref</strong> object to read / watch providers from within.</p>
+<p>In the <strong>initState()</strong> method, we invoke a method called <strong>preloadRiveAnimations</strong> which does what it says - preload all animations, using the <strong>BackgroundAnimations</strong> enum values and looping through them to create <strong>RiveAnimation</strong> instances and populating a map called <strong>animations</strong>.</p>
+<p>In the process, use <strong>RiveAnimation.asset</strong> to load the .RIV file from the assets, passing the name of the artboard from the corresponding enum in the iteration and a fit of <strong>BoxFit.contain</strong> (how it will fill its parent container), and since this call is asynchronous (we are loading a file - obviously!) we tap into the <strong>onInit</strong> method and wire up a callback, which gets triggered upon the .RIV file loading and the runtime ready. Then we instantiate a <strong>StateMachineController</strong> by calling the factory method <strong>fromArtboard</strong>, passing the instance of the artboard retrieved from loading, and the name of the state machine (luckily they both have the same name). We collect all <strong>StateMachineController</strong> instances in a collection to later dispose of them in the <strong>dispose()</strong> method when appropriate.</p>
+<p>This widget, in its <strong>build</strong> method, we listen to the newly created provider <strong>bgPageRouteProvider</strong> which we&#39;ll get notified when the route changes and get the route information as a string - this string should match the names of both the artboard and state machine in the .RIV file - that&#39;s why we pick it up from the route being passed.</p>
+<p>Here then we use our newly created mapping called <strong>pageRouteToAnimations</strong> within the <strong>Utils</strong> so we can grab the correct enum value, which by using its <strong>name</strong> property, we get the string representation, and in turn we pull the corresponding preloaded animation from the <strong>animations</strong> map.</p>
+<p>Lastly, we return the corresponding animation wrapped inside a <strong>SizedBox</strong> sized half of the screen, then inside an <strong>Align</strong> widget - and voilá! Right away as soon as things load, the animation will execute. No need to trigger anything since we made it so it just runs straight through and runs the animation matching the artboard and state machine. Simple, right?</p>
+<p>And everytime someone navigates to the corresponding route, we get notified (since we&#39;re watching the provider), and rebuild accordingly, setting our animation with the right artboard and state machine.</p>
+<h2 is-upgraded>Integrate the BgAnimation widget in the app</h2>
+<p>Now let&#39;s integrate it in the app. Go to the <strong>features/shell/presentation/porfoliomain.page.dart</strong> file, and add the <strong>BgAnimation</strong> widget right below the <strong>PageColor</strong> widget, so the animation shows on top of the background color, as such:</p>
+<pre><code language="language-dart" class="language-dart">//... inside the portfoliomain.page.dart
+
+body: Stack(
+    children: [
+        const PageColor(),
+        const BgAnimation(), // &lt;&lt;--- add it here
+        //... rest of the widgets omitted
+    ],
+)
+
+</code></pre>
+<p>And just like that, we have Rive animations taking our web app to a whole new level, beyond what implicit animations can take us! Kudos to you!!!</p>
+<p class="image-container"><img alt="App" src="img/7f12785d033f33d5.gif"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Wrap-up" duration="0">
+        <p>In this codelab, we accomplished the following:</p>
+<ul>
+<li>Installed the <strong>flutter_animate</strong> package</li>
+<li>Implemented <strong>implicit</strong> animations when needed, and <strong>explicit</strong> animations within our page widgets through the <strong>flutter_animate</strong> package</li>
+<li>Implemented page transitions by tapping into the <strong>GoRouter</strong> package pre-built page transition widgets and customizations available</li>
+<li>Implement more complex animated sequences using <strong>Rive</strong> and integrating them into your Flutter web apps</li>
+</ul>
+<p>More codelabs coming soon, so stay tuned!</p>
+<h2 is-upgraded>Please don&#39;t forget to follow me on social media:</h2>
+<ul>
+<li>On Twitter (<a href="https://www.twitter.com/drcoderz" target="_blank">@drcoderz</a>)</li>
+<li>On YouTube (<a href="https://www.youtube.com/channel/UCKsp3r1ERjCpKJtD2n5WtPg" target="_blank">Roman Just Codes</a>)</li>
+<li>On my <a href="https://romanjustcodes.web.app/" target="_blank">Personal Portfolio</a></li>
+<li>On <a href="https://medium.com/@romanejaquez" target="_blank">Medium</a></li>
+<li>On <a href="https://www.linkedin.com/in/roman-jaquez-8941a424/" target="_blank">LinkedIn</a></li>
+</ul>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/codelab-elements-tmp/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements-tmp/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements-tmp/prettify.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements-tmp/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
